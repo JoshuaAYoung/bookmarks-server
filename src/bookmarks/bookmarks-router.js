@@ -17,37 +17,37 @@ bookmarksRouter
       logger.error(`Title is required`);
       return res
         .status(400)
-        .send('Invalid data');
+        .send('Title is required');
     }
 
     if (!url) {
       logger.error(`URL is required`);
       return res
         .status(400)
-        .send('Invalid data');
+        .send('URL is required');
     }
 
     if (!description) {
       logger.error(`Description is required`);
       return res
         .status(400)
-        .send('Invalid data');
+        .send('Description is required');
     }
 
     if (!rating) {
       logger.error(`Rating is required`);
       return res
         .status(400)
-        .send('Invalid data');
+        .send('Rating is required');
     }
 
     const parsedRating = parseInt(rating);
 
     if (isNaN(parsedRating) || parsedRating < 1 || parsedRating > 5) {
-      logger.error(`Rating needs to be a number between 1 and 5`);
+      logger.error(`Invalid rating of ${rating} was supplied`);
       return res
         .status(400)
-        .send('Invalid data Num');
+        .send('Rating needs to be a number between 1 and 5');
     }
 
     const id = uuid();
