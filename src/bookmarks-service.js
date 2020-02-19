@@ -8,7 +8,7 @@ const BookmarksService = {
       .into('bookmarks')
       .returning('*')
       .then(rows => {
-        return rowns[0]
+        return rows[0]
       })
   },
   getById(knex, id) {

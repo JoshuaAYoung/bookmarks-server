@@ -24,6 +24,26 @@ function makeBookmarksArray() {
   ]
 }
 
+function testMaliciousBookmark() {
+  const maliciousBookmark = {
+    id: 911,
+    title: 'Bad script <script>alert("xss");</script>',
+    url: 'https://www.nonsense.com',
+    description: `bad img <img src="https://www.nonsense.floofer" onerror="alert(document.cookie);"> But not <strong>all</strong> bad.`,
+    rating: 500
+  }
+  const expectedBookmark = {
+    ...maliciousBookmark,
+    title: 'Bad script &lt;script&gt;alert(\"xss\");&lt;/script&gt;',
+    description: `bad img <img src="https://www.nonsense.floofer" onerror="alert(document.cookie);"> But not <strong>all</strong> bad.`,
+  }
+  return {
+    maliciousBookmark,
+    expectedBookmark
+  }
+}
+
 module.exports = {
   makeBookmarksArray,
+  testMaliciousBookmark
 }
