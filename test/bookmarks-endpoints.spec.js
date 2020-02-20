@@ -76,6 +76,7 @@ describe('Bookmarks Endpoints', function () {
         description: 'this is a test bookmark',
         rating: 4
       }
+      // added for use in camparing the post with the get
       let resBody;
 
       return supertest(app)
@@ -84,6 +85,7 @@ describe('Bookmarks Endpoints', function () {
         .send(newBookmark)
         .expect(201)
         .expect(res => {
+          // declares the variable
           resBody = res.body;
           expect(res.body.title).to.eql(newBookmark.title)
           expect(res.body.url).to.eql(newBookmark.url)
@@ -96,6 +98,7 @@ describe('Bookmarks Endpoints', function () {
           supertest(app)
             .get(`/bookmarks/${resBody.id}`)
             .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+            // compares the res with resBody for a match
             .expect(200, resBody)
         )
     })
@@ -178,7 +181,6 @@ describe('Bookmarks Endpoints', function () {
       })
 
       context(`Given bookmarks are in the database`, () => {
-        // might need to check destructure
         const testBookmarks = makeBookmarksArray()
 
         beforeEach('insert bookmarks', () => {
