@@ -95,7 +95,8 @@ bookmarksRouter
       .catch(next)
   })
   .get((req, res, next) => {
-    res.json(bookmarks.map(scrubBookmark))
+    // changed this to pass
+    res.json(scrubBookmark(res.bookmark))
   })
   .delete((req, res, next) => {
     BookmarksService.deleteBookmark(

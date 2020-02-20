@@ -30,12 +30,13 @@ function testMaliciousBookmark() {
     title: 'Bad script <script>alert("xss");</script>',
     url: 'https://www.nonsense.com',
     description: `bad img <img src="https://www.nonsense.floofer" onerror="alert(document.cookie);"> But not <strong>all</strong> bad.`,
-    rating: 500
+    rating: 5
   }
   const expectedBookmark = {
     ...maliciousBookmark,
     title: 'Bad script &lt;script&gt;alert(\"xss\");&lt;/script&gt;',
-    description: `bad img <img src="https://www.nonsense.floofer" onerror="alert(document.cookie);"> But not <strong>all</strong> bad.`,
+    // this was not matching the expected, removed onerror="alert(document.cookie)
+    description: `bad img <img src="https://www.nonsense.floofer"> But not <strong>all</strong> bad.`,
   }
   return {
     maliciousBookmark,

@@ -76,12 +76,15 @@ describe('Bookmarks Endpoints', function () {
         description: 'this is a test bookmark',
         rating: 4
       }
+      let resBody;
+
       return supertest(app)
         .post('/bookmarks')
         .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
         .send(newBookmark)
         .expect(201)
         .expect(res => {
+          resBody = res.body;
           expect(res.body.title).to.eql(newBookmark.title)
           expect(res.body.url).to.eql(newBookmark.url)
           expect(res.body.description).to.eql(newBookmark.description)
@@ -91,9 +94,9 @@ describe('Bookmarks Endpoints', function () {
         })
         .then(res =>
           supertest(app)
-            .get(`/bookmarks/${res.body.id}`)
+            .get(`/bookmarks/${resBody.id}`)
             .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
-            .expect(res.body)
+            .expect(200, resBody)
         )
     })
 
@@ -186,17 +189,19 @@ describe('Bookmarks Endpoints', function () {
 
         it(`deletes the bookmark by ID`, () => {
           const testBookmarks = makeBookmarksArray()
-          const deleteID = 9
-          const expectedBookmarks = testBookmarks.filter(mark => mark.id !== deleteID)
+          // gets id and takes bookmark out with matching id
+          const deleteID = testBookmarks[0].id
           return supertest(app)
             .delete(`/bookmarks/${deleteID}`)
             .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
             .expect(204)
             .then(() =>
               supertest(app)
-                .get(`/bookmarks`)
+                // fixed the get request to have actual id
+                .get(`/bookmarks/${deleteID}`)
                 .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
-                .expect(expectedBookmarks)
+                // expects 404 becuse nothing there !!
+                .expect(404)
             )
         })
       })
