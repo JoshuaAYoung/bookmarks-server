@@ -1,4 +1,5 @@
 // require('dotenv').config();
+const path = require('path')
 const express = require('express');
 // const uuid = require('uuid/v4');
 const logger = require('../logger');
@@ -16,7 +17,7 @@ const scrubBookmark = bookmark => ({
 })
 
 bookmarksRouter
-  .route('/bookmarks')
+  .route('/api/bookmarks')
   .get((req, res, next) => {
     const knexInstance = req.app.get('db')
     BookmarksService.getAllBookmarks(knexInstance)
@@ -71,20 +72,20 @@ bookmarksRouter
       .then(bookmark => {
         res
           .status(201)
-          .location(`/bookmarks/${bookmark.id}`)
+          .location(`/api/bookmarks/${bookmark.id}`)
           .json(scrubBookmark(bookmark))
       })
       .catch(next)
   })
 
 bookmarksRouter
-  .route('/bookmarks/:id')
+  .route('/api/bookmarks/:id')
   .all((req, res, next) => {
     const knexInstance = req.app.get('db')
     BookmarksService.getById(knexInstance, req.params.id)
       .then(bookmark => {
         if (!bookmark) {
-          logger.error(`Bookmark with id ${req.params.id} not found.`);
+          logger.info(`Bookmark with id ${req.params.id} doesn't exist.`)
           return res.status(404).json({
             error: { message: `Bookmark doesn't exist` }
           })
@@ -109,6 +110,28 @@ bookmarksRouter
       })
       .catch(next)
   })
+  .patch(bodyParser, (req, res, next) => {
+    const { title, url, description, rating } = req.body
+    const bookmarkToUpdate = { title, url, description, rating }
 
+    const numberOfValues = Object.values(bookmarkToUpdate).filter(Boolean).length
+    if (numberOfValues === 0) {
+      return res.status(400).json({
+        error: {
+          message: `Request body must contain either 'title', 'url', 'description' or 'rating'`
+        }
+      })
+    }
+
+    BookmarksService.updateBookmark(
+      req.app.get('db'),
+      req.params.id,
+      bookmarkToUpdate
+    )
+      .then(numRowsAffected => {
+        res.status(204).end()
+      })
+      .catch(next)
+  })
 
 module.exports = bookmarksRouter;
